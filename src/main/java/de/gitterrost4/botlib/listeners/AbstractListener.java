@@ -28,15 +28,15 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 /**
  * TODO documentation
  */
-public abstract class AbstractListener extends ListenerAdapter {
+public abstract class AbstractListener<T extends ServerConfig> extends ListenerAdapter {
 
   protected final JDA jda;
   protected final Guild guild;
-  protected final ServerConfig config;
+  protected final T config;
   protected final ModuleConfig moduleConfig;
   protected final ConnectionHelper connectionHelper;
 
-  public AbstractListener(JDA jda, Guild guild, ServerConfig config, ModuleConfig moduleConfig, String databaseFileName) {
+  public AbstractListener(JDA jda, Guild guild, T config, ModuleConfig moduleConfig, String databaseFileName) {
     super();
     this.jda = jda;
     this.guild = guild;
@@ -47,7 +47,7 @@ public abstract class AbstractListener extends ListenerAdapter {
     info("Initializing handler");
   }
 
-  public AbstractListener(JDA jda, Guild guild, ServerConfig config, ModuleConfig moduleConfig) {
+  public AbstractListener(JDA jda, Guild guild, T config, ModuleConfig moduleConfig) {
     this(jda, guild, config, moduleConfig, null);
   }
 

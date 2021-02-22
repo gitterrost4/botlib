@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class HelpListener extends AbstractMessageListener {
+public class HelpListener extends AbstractMessageListener<ServerConfig> {
 
   private ListenerManager listenerManager;
 
@@ -34,14 +34,14 @@ public class HelpListener extends AbstractMessageListener {
 
   private String getOverview(Member member) {
     return listenerManager.getListeners().stream().filter(listener -> listener instanceof AbstractMessageListener)
-        .map(listener -> (AbstractMessageListener) listener).map(listener -> listener.shortInfo(member))
+        .map(listener -> (AbstractMessageListener<? extends ServerConfig>) listener).map(listener -> listener.shortInfo(member))
         .filter(Optional::isPresent).map(Optional::get).collect(Collectors.joining("\n"));
   }
 
   private Optional<String> getCommandHelp(String command, Member member) {
 
     return listenerManager.getListeners().stream().filter(listener -> listener instanceof AbstractMessageListener)
-        .map(listener -> (AbstractMessageListener) listener).filter(listener -> listener.command.equals(command))
+        .map(listener -> (AbstractMessageListener<? extends ServerConfig>) listener).filter(listener -> listener.command.equals(command))
         .findFirst().flatMap(listener -> listener.help(member));
   }
 

@@ -24,25 +24,25 @@ import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
  * @author (C) cantamen/Paul Kramer 2019
  * @version $Id $
  */
-public abstract class AbstractMessageListener extends AbstractListener {
+public abstract class AbstractMessageListener<SC extends ServerConfig> extends AbstractListener<SC> {
 
   private List<String> PREFIXES = config.getBotPrefixes();
   protected final String command;
   private final String commandSeparator;
 
-  public AbstractMessageListener(JDA jda, Guild guild, ServerConfig config, CommandModuleConfig moduleConfig,
+  public AbstractMessageListener(JDA jda, Guild guild, SC config, CommandModuleConfig moduleConfig,
       String command) {
     this(jda, guild, config, moduleConfig, command, " +");
   }
 
-  public AbstractMessageListener(JDA jda, Guild guild, ServerConfig config, CommandModuleConfig moduleConfig,
+  public AbstractMessageListener(JDA jda, Guild guild, SC config, CommandModuleConfig moduleConfig,
       String command, String commandSeparator) {
     super(jda, guild, config, moduleConfig);
     this.command = command;
     this.commandSeparator = commandSeparator;
   }
 
-  public AbstractMessageListener(JDA jda, Guild guild, ServerConfig config, CommandModuleConfig moduleConfig,
+  public AbstractMessageListener(JDA jda, Guild guild, SC config, CommandModuleConfig moduleConfig,
       String command, String commandSeparator, String databaseFileName) {
     super(jda, guild, config, moduleConfig, databaseFileName);
     this.command = command;

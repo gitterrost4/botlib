@@ -11,10 +11,12 @@ plugins {
     id 'java-library'
     id 'application'
     id "com.github.johnrengelman.shadow" version "4.0.4"
+    id 'maven-publish'
+    id 'publishing'
 }
 
-version = '2.1'
-mainClassName="Main"
+group = 'de.gitterrost4'
+version = '2.1.4-SNAPSHOT'
 
 dependencies {
     // This dependency is exported to consumers, that is to say found on their compile classpath.
@@ -33,6 +35,9 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
     mavenCentral()
+    maven {
+      url "https://mymavenrepo.com/repo/QXJWDWuuUKdS20BQUsqk/"
+    }
 }
 
 dependencies {
@@ -43,4 +48,21 @@ dependencies {
   compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.6'
   compile 'org.slf4j:slf4j-api:1.7.13'
   compile 'ch.qos.logback:logback-classic:1.2.3'
+}
+
+publishing {
+  repositories {
+    maven {
+      url "https://mymavenrepo.com/repo/jQCGMyicGoPVSMldwU0G/"
+      credentials {
+        username "myMavenRepo"
+        password "reaperOdeath59"
+      }
+    }
+  }
+  publications {
+    maven(MavenPublication) {
+      from components.java
+    }
+  }
 }
