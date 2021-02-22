@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>de.gitterrost4</groupId>
+  <artifactId>botlib</artifactId>
+  <versioning>
+    <release>2.1</release>
+    <versions>
+      <version>2.1</version>
+    </versions>
+    <lastUpdated>20210222101556</lastUpdated>
+  </versioning>
+</metadata>
