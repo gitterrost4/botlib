@@ -15,7 +15,7 @@ plugins {
 }
 
 group = 'de.gitterrost4'
-version = '2.1.4'
+version = '2.1.5'
 
 dependencies {
     // This dependency is exported to consumers, that is to say found on their compile classpath.
@@ -34,6 +34,7 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
     mavenCentral()
+    mavenLocal()
     maven {
       url "https://mymavenrepo.com/repo/QXJWDWuuUKdS20BQUsqk/"
     }
