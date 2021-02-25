@@ -64,7 +64,7 @@ public abstract class AbstractMessageListener<SC extends ServerConfig> extends A
     handleEvent(event, event.getMessage().getContentRaw(), (e, c) -> channelRestrict(e, c));
   }
 
-  private final boolean isSuperUser(Member m) {
+  protected final boolean isSuperUser(Member m) {
     return Optional.ofNullable(config.getSuperUserRoles())
         .filter(suRoles -> m.getRoles().stream().map(Role::getName).anyMatch(suRoles::contains)).isPresent();
   }
