@@ -7,8 +7,10 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.gitterrost4.botlib.config.containers.modules.AlarmConfig;
 import de.gitterrost4.botlib.config.containers.modules.HelpConfig;
 import de.gitterrost4.botlib.config.containers.modules.ModuleConfig;
+import de.gitterrost4.botlib.listeners.AlarmListener;
 import de.gitterrost4.botlib.listeners.HelpListener;
 import de.gitterrost4.botlib.listeners.ListenerManager;
 import net.dv8tion.jda.api.JDA;
@@ -23,6 +25,7 @@ public abstract class ServerConfig {
   private List<String> superUserRoles = new ArrayList<>();
   String databaseFileName;
   private HelpConfig helpConfig;
+  private AlarmConfig alarmConfig;
 
   
   
@@ -30,7 +33,7 @@ public abstract class ServerConfig {
   public String toString() {
     return "ServerConfig [name=" + name + ", serverId=" + serverId + ", botPrefixes=" + botPrefixes
         + ", superUserRoles=" + superUserRoles + ", databaseFileName=" + databaseFileName + ", helpConfig=" + helpConfig
-        + "]";
+        + ", alarmConfig=" + alarmConfig + "]";
   }
 
   public List<String> getSuperUserRoles() {
@@ -56,6 +59,10 @@ public abstract class ServerConfig {
   public HelpConfig getHelpConfig() {
     return helpConfig;
   }
+  
+  public AlarmConfig getAlarmConfig() {
+    return alarmConfig;
+  }
 
   public void iAddServerModules(JDA jda) {
     Guild guild = jda.getGuildById(getServerId());
@@ -67,6 +74,9 @@ public abstract class ServerConfig {
     ListenerManager manager = new ListenerManager(jda);
     if (Optional.ofNullable(getHelpConfig()).map(ModuleConfig::isEnabled).orElse(false)) {
       manager.addEventListener(new HelpListener(jda, guild, this, manager));
+    }
+    if (Optional.ofNullable(getAlarmConfig()).map(ModuleConfig::isEnabled).orElse(false)) {
+      manager.addEventListener(new AlarmListener(jda, guild, this));
     }
     addServerModules(jda, guild, manager);
   }
