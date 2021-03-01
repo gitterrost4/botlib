@@ -2,6 +2,7 @@ package de.gitterrost4.botlib.helpers;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.TimerTask;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -26,4 +27,14 @@ public class Utilities {
         retrievedHistory.forEach(msg -> msg.delete().queue());
       }
     }
+  
+  public static TimerTask timerTask(Runnable r) {
+    return new TimerTask() {
+      
+      @Override
+      public void run() {
+        r.run();
+      }
+    };
+  }
 }
