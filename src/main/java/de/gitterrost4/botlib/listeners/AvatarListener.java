@@ -17,7 +17,7 @@ public class AvatarListener extends AbstractMessageListener<ServerConfig> {
   @Override
   protected void messageReceived(MessageReceivedEvent event, CommandMessage messageContent) {
     Member member = getMemberFromSearchString(messageContent.getArg(0), ()->event.getMember());
-    event.getChannel().sendMessage(setEmbedAuthor(new EmbedBuilder(), member).setTitle("Avatar").setImage(member.getUser().getEffectiveAvatarUrl()+"?size=256").build())
+    event.getChannel().sendMessage(setEmbedAuthor(new EmbedBuilder(), member).setTitle("Avatar").setImage(member.getUser().getEffectiveAvatarUrl()+"?size=512").build())
     .queue();
   }
 
