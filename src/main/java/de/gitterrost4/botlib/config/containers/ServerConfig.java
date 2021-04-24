@@ -11,6 +11,7 @@ import de.gitterrost4.botlib.config.containers.modules.AlarmConfig;
 import de.gitterrost4.botlib.config.containers.modules.AutoRespondConfig;
 import de.gitterrost4.botlib.config.containers.modules.AvatarConfig;
 import de.gitterrost4.botlib.config.containers.modules.BanConfig;
+import de.gitterrost4.botlib.config.containers.modules.FakeBanConfig;
 import de.gitterrost4.botlib.config.containers.modules.HelpConfig;
 import de.gitterrost4.botlib.config.containers.modules.MirrorConfig;
 import de.gitterrost4.botlib.config.containers.modules.ModlogConfig;
@@ -31,6 +32,7 @@ import de.gitterrost4.botlib.listeners.RoleCountListener;
 import de.gitterrost4.botlib.listeners.SayListener;
 import de.gitterrost4.botlib.listeners.WhoisListener;
 import de.gitterrost4.botlib.listeners.modtools.BanListener;
+import de.gitterrost4.botlib.listeners.modtools.FakeBanListener;
 import de.gitterrost4.botlib.listeners.modtools.UnbanListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -54,6 +56,7 @@ public abstract class ServerConfig {
   private SayConfig sayConfig;
   private WhoisConfig whoisConfig;
   private BanConfig banConfig;
+  private FakeBanConfig fakeBanConfig;
   
   @Override
   public String toString() {
@@ -126,6 +129,10 @@ public abstract class ServerConfig {
     return banConfig;
   }
 
+  public FakeBanConfig getFakeBanConfig() {
+    return fakeBanConfig;
+  }
+
   public void iAddServerModules(JDA jda) {
     Guild guild = jda.getGuildById(getServerId());
     if (guild == null) {
@@ -167,6 +174,9 @@ public abstract class ServerConfig {
     if (Optional.ofNullable(getBanConfig()).map(ModuleConfig::isEnabled).orElse(false)) {
       manager.addEventListener(new BanListener(jda, guild, this));
       manager.addEventListener(new UnbanListener(jda, guild, this));
+    }
+    if (Optional.ofNullable(getFakeBanConfig()).map(ModuleConfig::isEnabled).orElse(false)) {
+      manager.addEventListener(new FakeBanListener(jda, guild, this));
     }
     addServerModules(jda, guild, manager);
   }
