@@ -16,6 +16,7 @@ import de.gitterrost4.botlib.config.containers.modules.HelpConfig;
 import de.gitterrost4.botlib.config.containers.modules.MirrorConfig;
 import de.gitterrost4.botlib.config.containers.modules.ModlogConfig;
 import de.gitterrost4.botlib.config.containers.modules.ModuleConfig;
+import de.gitterrost4.botlib.config.containers.modules.MuteConfig;
 import de.gitterrost4.botlib.config.containers.modules.ReminderConfig;
 import de.gitterrost4.botlib.config.containers.modules.RoleCountConfig;
 import de.gitterrost4.botlib.config.containers.modules.SayConfig;
@@ -33,7 +34,9 @@ import de.gitterrost4.botlib.listeners.SayListener;
 import de.gitterrost4.botlib.listeners.WhoisListener;
 import de.gitterrost4.botlib.listeners.modtools.BanListener;
 import de.gitterrost4.botlib.listeners.modtools.FakeBanListener;
+import de.gitterrost4.botlib.listeners.modtools.MuteListener;
 import de.gitterrost4.botlib.listeners.modtools.UnbanListener;
+import de.gitterrost4.botlib.listeners.modtools.UnmuteListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 
@@ -57,12 +60,13 @@ public abstract class ServerConfig {
   private WhoisConfig whoisConfig;
   private BanConfig banConfig;
   private FakeBanConfig fakeBanConfig;
+  private MuteConfig muteConfig;  
   
   @Override
   public String toString() {
     return "ServerConfig [name=" + name + ", serverId=" + serverId + ", botPrefixes=" + botPrefixes
         + ", superUserRoles=" + superUserRoles + ", databaseFileName=" + databaseFileName + ", helpConfig=" + helpConfig
-        + ", alarmConfig=" + alarmConfig + "]";
+        + ", muteConfig=" + muteConfig + ", alarmConfig=" + alarmConfig + "]";
   }
 
   public List<String> getSuperUserRoles() {
@@ -133,6 +137,10 @@ public abstract class ServerConfig {
     return fakeBanConfig;
   }
 
+  public MuteConfig getMuteConfig() {
+    return muteConfig;
+  }
+
   public void iAddServerModules(JDA jda) {
     Guild guild = jda.getGuildById(getServerId());
     if (guild == null) {
@@ -177,6 +185,10 @@ public abstract class ServerConfig {
     }
     if (Optional.ofNullable(getFakeBanConfig()).map(ModuleConfig::isEnabled).orElse(false)) {
       manager.addEventListener(new FakeBanListener(jda, guild, this));
+    }
+    if (Optional.ofNullable(getMuteConfig()).map(ModuleConfig::isEnabled).orElse(false)) {
+      manager.addEventListener(new MuteListener(jda, guild, this));
+      manager.addEventListener(new UnmuteListener(jda, guild, this));
     }
     addServerModules(jda, guild, manager);
   }
