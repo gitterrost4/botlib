@@ -12,6 +12,7 @@ import de.gitterrost4.botlib.config.containers.modules.AutoRespondConfig;
 import de.gitterrost4.botlib.config.containers.modules.AvatarConfig;
 import de.gitterrost4.botlib.config.containers.modules.BanConfig;
 import de.gitterrost4.botlib.config.containers.modules.FakeBanConfig;
+import de.gitterrost4.botlib.config.containers.modules.GibConfig;
 import de.gitterrost4.botlib.config.containers.modules.HelpConfig;
 import de.gitterrost4.botlib.config.containers.modules.MirrorConfig;
 import de.gitterrost4.botlib.config.containers.modules.ModlogConfig;
@@ -24,6 +25,7 @@ import de.gitterrost4.botlib.config.containers.modules.WhoisConfig;
 import de.gitterrost4.botlib.listeners.AlarmListener;
 import de.gitterrost4.botlib.listeners.AutoRespondListener;
 import de.gitterrost4.botlib.listeners.AvatarListener;
+import de.gitterrost4.botlib.listeners.GibListener;
 import de.gitterrost4.botlib.listeners.HelpListener;
 import de.gitterrost4.botlib.listeners.ListenerManager;
 import de.gitterrost4.botlib.listeners.MirrorListener;
@@ -61,12 +63,17 @@ public abstract class ServerConfig {
   private BanConfig banConfig;
   private FakeBanConfig fakeBanConfig;
   private MuteConfig muteConfig;  
+  private GibConfig gibConfig;
   
   @Override
   public String toString() {
     return "ServerConfig [name=" + name + ", serverId=" + serverId + ", botPrefixes=" + botPrefixes
         + ", superUserRoles=" + superUserRoles + ", databaseFileName=" + databaseFileName + ", helpConfig=" + helpConfig
-        + ", muteConfig=" + muteConfig + ", alarmConfig=" + alarmConfig + "]";
+        + ", alarmConfig=" + alarmConfig + ", autoRespondConfig=" + autoRespondConfig + ", avatarConfig=" + avatarConfig
+        + ", mirrorConfig=" + mirrorConfig + ", modlogConfig=" + modlogConfig + ", reminderConfig=" + reminderConfig
+        + ", roleCountConfig=" + roleCountConfig + ", sayConfig=" + sayConfig + ", whoisConfig=" + whoisConfig
+        + ", banConfig=" + banConfig + ", fakeBanConfig=" + fakeBanConfig + ", muteConfig=" + muteConfig
+        + ", gibConfig=" + gibConfig + "]";
   }
 
   public List<String> getSuperUserRoles() {
@@ -141,6 +148,14 @@ public abstract class ServerConfig {
     return muteConfig;
   }
 
+  public static Logger getLogger() {
+    return logger;
+  }
+
+  public GibConfig getGibConfig() {
+    return gibConfig;
+  }
+
   public void iAddServerModules(JDA jda) {
     Guild guild = jda.getGuildById(getServerId());
     if (guild == null) {
@@ -189,6 +204,9 @@ public abstract class ServerConfig {
     if (Optional.ofNullable(getMuteConfig()).map(ModuleConfig::isEnabled).orElse(false)) {
       manager.addEventListener(new MuteListener(jda, guild, this));
       manager.addEventListener(new UnmuteListener(jda, guild, this));
+    }
+    if (Optional.ofNullable(getGibConfig()).map(ModuleConfig::isEnabled).orElse(false)) {
+      manager.addEventListener(new GibListener(jda, guild, this));
     }
     addServerModules(jda, guild, manager);
   }
