@@ -3,6 +3,9 @@
 package de.gitterrost4.botlib.listeners;
 
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -36,6 +39,8 @@ public abstract class AbstractListener<T extends ServerConfig> extends ListenerA
   protected final ModuleConfig moduleConfig;
   protected final ConnectionHelper connectionHelper;
 
+  private static ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+  
   public AbstractListener(JDA jda, Guild guild, T config, ModuleConfig moduleConfig, String databaseFileName) {
     super();
     this.jda = jda;
@@ -54,91 +59,102 @@ public abstract class AbstractListener<T extends ServerConfig> extends ListenerA
   @Override
   public final void onMessageReceived(MessageReceivedEvent event) {
     super.onMessageReceived(event);
-    if (event.getAuthor().isBot()) {
-      return;
-    }
-    
-    if(!event.isFromGuild()) {
-      return;
-    }
-
-    if (!event.getGuild().getId().equals(guild.getId())) {
-      return;
-    }
-    if (event.isWebhookMessage()) {
-      return;
-    }
-
-    messageReceived(event);
-
+    runAsync(()->{
+      if (event.getAuthor().isBot()) {
+        return;
+      }
+      
+      if(!event.isFromGuild()) {
+        return;
+      }
+  
+      if (!event.getGuild().getId().equals(guild.getId())) {
+        return;
+      }
+      if (event.isWebhookMessage()) {
+        return;
+      }
+  
+      messageReceived(event);
+    });
   }
 
   @Override
   public final void onPrivateMessageReactionAdd(PrivateMessageReactionAddEvent event) {
     super.onPrivateMessageReactionAdd(event);
-    if (event.getUser().isBot()) {
-      return;
-    }
-    privateMessageReactionAdd(event);
+    runAsync(()->{
+      if (event.getUser().isBot()) {
+        return;
+      }
+      privateMessageReactionAdd(event);
+    });
   }
 
   @Override
   public final void onMessageReactionAdd(MessageReactionAddEvent event) {
     super.onMessageReactionAdd(event);
-    if (event.getUser().isBot()) {
-      return;
-    }
-    if (event.getChannelType() == ChannelType.PRIVATE) {
-      return;
-    }
-    if (!event.getGuild().getId().equals(guild.getId())) {
-      return;
-    }
-    messageReactionAdd(event);
+    runAsync(()->{
+      if (event.getUser().isBot()) {
+        return;
+      }
+      if (event.getChannelType() == ChannelType.PRIVATE) {
+        return;
+      }
+      if (!event.getGuild().getId().equals(guild.getId())) {
+        return;
+      }
+      messageReactionAdd(event);
+    });
   };
 
   @Override
   public void onMessageReactionRemove(MessageReactionRemoveEvent event) {
     super.onMessageReactionRemove(event);
-    if (event.getUser().isBot()) {
-      return;
-    }
-    if (event.getChannelType() == ChannelType.PRIVATE) {
-      return;
-    }
-    if (!event.getGuild().getId().equals(guild.getId())) {
-      return;
-    }
-    messageReactionRemove(event);
+    runAsync(()->{
+      if (event.getUser().isBot()) {
+        return;
+      }
+      if (event.getChannelType() == ChannelType.PRIVATE) {
+        return;
+      }
+      if (!event.getGuild().getId().equals(guild.getId())) {
+        return;
+      }
+      messageReactionRemove(event);
+    });
   }
 
   @Override
   public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
     super.onGuildMessageReceived(event);
-    if (!event.getGuild().getId().equals(guild.getId())) {
-      return;
-    }
-    if (Optional.ofNullable(event).map(GuildMessageReceivedEvent::getMember).map(Member::getUser).map(User::isBot)
-        .orElse(false)) {
-      return;
-    }
-    if (event.isWebhookMessage()) {
-      return;
-    }
-    guildMessageReceived(event);
+    runAsync(()->{
+      if (!event.getGuild().getId().equals(guild.getId())) {
+        return;
+      }
+      if (Optional.ofNullable(event).map(GuildMessageReceivedEvent::getMember).map(Member::getUser).map(User::isBot)
+          .orElse(false)) {
+        return;
+      }
+      if (event.isWebhookMessage()) {
+        return;
+      }
+      guildMessageReceived(event);
+    });
   }
 
   @Override
   public void onMessageUpdate(MessageUpdateEvent event) {
     super.onMessageUpdate(event);
-    if (!event.getGuild().getId().equals(guild.getId())) {
-      return;
-    }
-    if (Optional.ofNullable(event).map(MessageUpdateEvent::getMember).map(Member::getUser).map(User::isBot)
-        .orElse(false)) {
-      return;
-    }
-    messageUpdate(event);
+    runAsync(()->{
+      if (!event.getGuild().getId().equals(guild.getId())) {
+        return;
+      }
+      if (Optional.ofNullable(event).map(MessageUpdateEvent::getMember).map(Member::getUser).map(User::isBot)
+          .orElse(false)) {
+        return;
+      }
+      messageUpdate(event);
+    });
   }
 
   /**
@@ -248,6 +264,11 @@ public abstract class AbstractListener<T extends ServerConfig> extends ListenerA
         .findFirst()))
       .orElseGet(otherwise);
   }
+  
+  protected static Future<?> runAsync(Runnable r) {
+    return executor.submit(r);
+  }
+  
 }
 
 // end of file
