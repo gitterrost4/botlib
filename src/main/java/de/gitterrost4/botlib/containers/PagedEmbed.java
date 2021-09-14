@@ -51,7 +51,7 @@ public class PagedEmbed {
   }
 
   public String display(MessageChannel channel) {
-    message = channel.sendMessage(pages.get(currentPage)).complete(); // when creating, currentPage is always 0
+    message = channel.sendMessageEmbeds(pages.get(currentPage)).complete(); // when creating, currentPage is always 0
     message.addReaction(Emoji.ARROW_DOUBLE_BACKWARD.asRepresentation()).queue();
     message.addReaction(Emoji.ARROW_BACKWARD.asRepresentation()).queue();
     message.addReaction(Emoji.ARROW_FORWARD.asRepresentation()).queue();
@@ -63,7 +63,7 @@ public class PagedEmbed {
     if (currentPage < 0 || currentPage >= pages.size()) {
       throw new IllegalStateException("index out of bounds");
     }
-    message.editMessage(pages.get(currentPage)).complete();
+    message.editMessageEmbeds(pages.get(currentPage)).complete();
   }
 
   public void test6() {

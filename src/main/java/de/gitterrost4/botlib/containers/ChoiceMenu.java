@@ -51,7 +51,7 @@ public class ChoiceMenu {
   }
   
   public String display(MessageChannel channel) {
-    message = channel.sendMessage(buildEmbed().build()).complete();
+    message = channel.sendMessageEmbeds(buildEmbed().build()).complete();
     message.addReaction(Emoji.ARROW_UP_SMALL.asRepresentation()).queue();
     message.addReaction(Emoji.ARROW_DOWN_SMALL.asRepresentation()).queue();
     message.addReaction(Emoji.WHITE_CHECK_MARK.asRepresentation()).queue();
@@ -69,7 +69,7 @@ public class ChoiceMenu {
   }
 
   public void update() {
-    message.editMessage(buildEmbed().build()).queue();
+    message.editMessageEmbeds(buildEmbed().build()).queue();
   }
 
   public boolean handleReaction(MessageReactionAddEvent event) {

@@ -27,7 +27,7 @@ public class WhoisListener extends AbstractMessageListener<ServerConfig> {
     Optional<String> userString = messageContent.getArg(0,true);
     Member member = getMemberFromSearchString(userString, () -> event.getMember());
     List<Member> sortedMemberList = guild().getMemberCache().applyStream(stream->stream.sorted((x,y)->x.getTimeJoined().compareTo(y.getTimeJoined())).collect(Collectors.toList()));
-    event.getChannel().sendMessage(setEmbedAuthor(new EmbedBuilder(), member).setDescription(member.getAsMention())
+    event.getChannel().sendMessageEmbeds(setEmbedAuthor(new EmbedBuilder(), member).setDescription(member.getAsMention())
         .addField("Joined", member.getTimeJoined().format(DateTimeFormatter.ofPattern("EEE, MMM dd, uuuu h:mm a")), true)
         .addField("Join Position", String.valueOf(IntStream.range(0, sortedMemberList.size()).filter(i->member.getId().equals(sortedMemberList.get(i).getId())).findAny().orElse(-1)),true)
         .addField("Registered", member.getUser().getTimeCreated().format(DateTimeFormatter.ofPattern("EEE, MMM dd, uuuu h:mm a")), true)
