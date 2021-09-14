@@ -39,6 +39,10 @@ public enum Emoji {
     return new StringBuilder().appendCodePoint(Integer.parseInt(representation.substring(2),16)).toString();
   }
   
+  public net.dv8tion.jda.api.entities.Emoji asEmoji(){
+    return net.dv8tion.jda.api.entities.Emoji.fromUnicode(representation);
+  }
+  
 }
 
 

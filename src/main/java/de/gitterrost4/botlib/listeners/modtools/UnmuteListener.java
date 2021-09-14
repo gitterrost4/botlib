@@ -2,9 +2,7 @@
 // (C) cantamen/Paul Kramer 2020
 package de.gitterrost4.botlib.listeners.modtools;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,14 +16,11 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 /**
  * TODO documentation
  */
 public class UnmuteListener extends AbstractMessageListener<ServerConfig> {
-
-  public Map<String, ChoiceMenu> activeMenus = new HashMap<>();
 
   public UnmuteListener(JDA jda, Guild guild, ServerConfig config) {
     super(jda, guild, config, config.getMuteConfig(), "unmute");
@@ -77,23 +72,13 @@ public class UnmuteListener extends AbstractMessageListener<ServerConfig> {
     builder.setDescription("Choose a member to be unmuted");
 
     ChoiceMenu menu = builder.build();
-    activeMenus.put(menu.display(event.getChannel()), menu);
+    menu.setAccessControl(e->guild().getMember(e.getUser()).hasPermission(Permission.BAN_MEMBERS));
+    menu.display(event.getChannel());
   }
 
   @Override
   protected boolean hasAccess(Member member) {
     return member.hasPermission(Permission.BAN_MEMBERS);
-  }
-
-  @Override
-  protected void messageReactionAdd(MessageReactionAddEvent event) {
-    super.messageReactionAdd(event);
-    if (activeMenus.containsKey(event.getMessageId())) {
-      if (!guild().getMember(event.getUser()).hasPermission(Permission.BAN_MEMBERS)) {
-        return;
-      }
-      activeMenus.get(event.getMessageId()).handleReaction(event);
-    }
   }
 
   @Override

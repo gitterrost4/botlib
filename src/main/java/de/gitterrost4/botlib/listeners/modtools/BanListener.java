@@ -4,10 +4,8 @@ package de.gitterrost4.botlib.listeners.modtools;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Timer;
@@ -24,15 +22,12 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 /**
  * TODO documentation
  */
 public class BanListener extends AbstractMessageListener<ServerConfig> {
-
-  public Map<String, ChoiceMenu> activeMenus = new HashMap<>();
-
+  
   public BanListener(JDA jda, Guild guild, ServerConfig config) {
     super(jda, guild, config,config.getBanConfig(), "ban");
     connectionHelper.update(
@@ -97,23 +92,13 @@ public class BanListener extends AbstractMessageListener<ServerConfig> {
     builder.setDescription("Choose a member to be banned" + durationString);
 
     ChoiceMenu menu = builder.build();
-    activeMenus.put(menu.display(event.getChannel()), menu);
+    menu.setAccessControl(e->guild().getMember(e.getUser()).hasPermission(Permission.BAN_MEMBERS));
+    menu.display(event.getChannel());
   }
 
   @Override
   protected boolean hasAccess(Member member) {
     return member.hasPermission(Permission.BAN_MEMBERS);
-  }
-
-  @Override
-  protected void messageReactionAdd(MessageReactionAddEvent event) {
-    super.messageReactionAdd(event);
-    if (activeMenus.containsKey(event.getMessageId())) {
-      if (!guild().getMember(event.getUser()).hasPermission(Permission.BAN_MEMBERS)) {
-        return;
-      }
-      activeMenus.get(event.getMessageId()).handleReaction(event);
-    }
   }
 
   private class Unbanner extends TimerTask {

@@ -5,14 +5,17 @@ package de.gitterrost4.botlib.containers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import de.gitterrost4.botlib.helpers.Emoji;
+import de.gitterrost4.botlib.listeners.GlobalMenuListener;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.interactions.components.Button;
 
 /** 
  * TODO documentation
@@ -22,10 +25,10 @@ public class ChoiceMenu {
   private final String title;
   private final String description;
   private final List<MenuEntry> entries;
-  private Message message;
   private final Consumer<MenuEntry> choiceHandler;
   private int selected = 0;
-
+  Predicate<ButtonClickEvent> accessControlPredicate = e->true;
+  
   private ChoiceMenu(String title, String description, List<MenuEntry> entries, Consumer<MenuEntry> handler) {
     super();
     this.entries=entries;
@@ -50,13 +53,16 @@ public class ChoiceMenu {
     }
   }
   
-  public String display(MessageChannel channel) {
-    message = channel.sendMessageEmbeds(buildEmbed().build()).complete();
-    message.addReaction(Emoji.ARROW_UP_SMALL.asRepresentation()).queue();
-    message.addReaction(Emoji.ARROW_DOWN_SMALL.asRepresentation()).queue();
-    message.addReaction(Emoji.WHITE_CHECK_MARK.asRepresentation()).queue();
-    message.addReaction(Emoji.NEGATIVE_SQUARED_CROSS_MARK.asRepresentation()).queue();
-    return message.getId();
+  public void display(MessageChannel channel) {
+    Message message = channel.sendMessageEmbeds(buildEmbed().build())
+        .setActionRow(
+            Button.secondary("choiceMenuUp", Emoji.ARROW_UP_SMALL.asEmoji()),
+            Button.secondary("choiceMenuDown", Emoji.ARROW_DOWN_SMALL.asEmoji()),
+            Button.primary("choiceMenuOkay", Emoji.WHITE_CHECK_MARK.asEmoji()),
+            Button.danger("choiceMenuCancel", Emoji.NEGATIVE_SQUARED_CROSS_MARK.asEmoji())
+            )
+        .complete();
+    GlobalMenuListener.register(message.getId(), this);
   }
 
   private EmbedBuilder buildEmbed() {
@@ -68,47 +74,50 @@ public class ChoiceMenu {
     return builder;
   }
 
-  public void update() {
-    message.editMessageEmbeds(buildEmbed().build()).queue();
+  public void update(ButtonClickEvent event) {
+    event.editMessageEmbeds(buildEmbed().build()).queue();
   }
 
-  public boolean handleReaction(MessageReactionAddEvent event) {
-    if(event.getReactionEmote().getEmoji().equals(Emoji.ARROW_UP_SMALL.asString())) {
-      event.getChannel().retrieveMessageById(event.getMessageId()).queue(message->message.removeReaction(event.getReactionEmote().getEmoji(),event.getUser()).queue());
+  public void setAccessControl(Predicate<ButtonClickEvent> pred) {
+    this.accessControlPredicate=pred;
+  }
+
+  public boolean handleButtonClick(ButtonClickEvent event) {
+    if(!accessControlPredicate.test(event)) {
+      event.reply("You are not allowed to do that.").setEphemeral(true).queue();
+      return false;
+    }
+    switch(event.getComponentId()) {
+    case "choiceMenuUp":
       if(selected == 0) {
         selected = entries.size()-1;
       } else {
         selected--;
       }
-      update();
+      update(event);
       return false;
-    }
-    if(event.getReactionEmote().getEmoji().equals(Emoji.ARROW_DOWN_SMALL.asString())) {
-      event.getChannel().retrieveMessageById(event.getMessageId()).queue(message->message.removeReaction(event.getReactionEmote().getEmoji(),event.getUser()).queue());
+    case "choiceMenuDown":
       if(selected == entries.size()-1) {
         selected = 0;
       } else {
         selected++;
       }
-      update();
+      update(event);
+      return false;
+    case "choiceMenuOkay":
+      choiceHandler.accept(entries.get(selected));
+      event.deferEdit();
+      event.getMessage().delete().queue();
+      return true;
+    case "choiceMenuCancel":
+      event.deferEdit();
+      event.getMessage().delete().queue();
+      return true;
+    default:
       return false;
     }
-    if(event.getReactionEmote().getEmoji().equals(Emoji.WHITE_CHECK_MARK.asString())) {
-      choiceHandler.accept(entries.get(selected));
-      delete();
-      return true;
-    }
-    if(event.getReactionEmote().getEmoji().equals(Emoji.NEGATIVE_SQUARED_CROSS_MARK.asString())) {
-      delete();
-      return true;
-    }
-    return false;
   }
 
-  private void delete() {
-    message.delete().queue();
-  }
-  
   public static ChoiceMenuBuilder builder() {
     return new ChoiceMenuBuilder();
   }

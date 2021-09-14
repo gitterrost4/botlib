@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -106,6 +107,24 @@ public abstract class AbstractListener<T extends ServerConfig> extends ListenerA
       messageReactionAdd(event);
     });
   };
+  
+  @Override
+  public final void onButtonClick(ButtonClickEvent event) {
+    super.onButtonClick(event);
+    runAsync(()->{
+      if (event.getUser().isBot()) {
+        return;
+      }
+      if (event.getChannelType() == ChannelType.PRIVATE) {
+        return;
+      }
+      if (!event.getGuild().getId().equals(guild.getId())) {
+        return;
+      }
+      buttonClick(event);
+    });
+    
+  }
 
   @Override
   public void onMessageReactionRemove(MessageReactionRemoveEvent event) {
@@ -202,6 +221,14 @@ public abstract class AbstractListener<T extends ServerConfig> extends ListenerA
    *        event object
    */
   protected void guildMessageReceived(GuildMessageReceivedEvent event) {
+    // do nothing by default
+  }
+
+  /**
+   * @param event
+   *        event object
+   */
+  protected void buttonClick(ButtonClickEvent event) {
     // do nothing by default
   }
 

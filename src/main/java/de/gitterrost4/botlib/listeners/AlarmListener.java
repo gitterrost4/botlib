@@ -2,10 +2,8 @@ package de.gitterrost4.botlib.listeners;
 
 import java.awt.Color;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.stream.Collectors;
@@ -28,11 +26,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class AlarmListener extends AbstractMessageListener<ServerConfig> {
-
-  public Map<String, PagedEmbed> activePagedEmbeds = new HashMap<>();
 
   public AlarmListener(JDA jda, Guild guild, ServerConfig config) {
     super(jda, guild, config, config.getAlarmConfig(), "alarm");
@@ -88,7 +83,7 @@ public class AlarmListener extends AbstractMessageListener<ServerConfig> {
     case "list":
       PagedEmbed pagedEmbed = new PagedEmbed(Alarm.readAlarmsFromDatabase(connectionHelper, guild()).stream()
           .map(Alarm::toEmbed).collect(Collectors.toList()));
-      activePagedEmbeds.put(pagedEmbed.display(event.getChannel()), pagedEmbed);
+      pagedEmbed.display(event.getChannel());
       break;
     }
   }
@@ -121,14 +116,6 @@ public class AlarmListener extends AbstractMessageListener<ServerConfig> {
   protected String usageInternal() {
     // TODO Auto-generated method stub
     return super.usageInternal();
-  }
-
-  @Override
-  protected void messageReactionAdd(MessageReactionAddEvent event) {
-    super.messageReactionAdd(event);
-    if (activePagedEmbeds.containsKey(event.getMessageId())) {
-      activePagedEmbeds.get(event.getMessageId()).handleReaction(event);
-    }
   }
 
   private static class Alarm {
