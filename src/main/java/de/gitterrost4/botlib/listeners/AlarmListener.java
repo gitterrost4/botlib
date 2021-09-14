@@ -61,13 +61,13 @@ public class AlarmListener extends AbstractMessageListener<ServerConfig> {
       Alarm newAlarm = new Alarm(newName, cronExpression, channel, ping, title, newMessage, durationSeconds, ZonedDateTime.now(),
           connectionHelper, guild);
       newAlarm.writeToDatabase();
-      event.getChannel().sendMessage(newAlarm.toEmbed()).queue();
+      event.getChannel().sendMessageEmbeds(newAlarm.toEmbed()).queue();
       break;
     case "activate":
       String aName = message.getTokenizedArgOrThrow(1);
       Alarm.findByName(aName, connectionHelper, guild()).ifPresent(alarm -> {
         alarm.activate();
-        event.getChannel().sendMessage(alarm.toEmbed()).queue();
+        event.getChannel().sendMessageEmbeds(alarm.toEmbed()).queue();
       });
 
       break;
@@ -75,7 +75,7 @@ public class AlarmListener extends AbstractMessageListener<ServerConfig> {
       String dName = message.getTokenizedArgOrThrow(1);
       Alarm.findByName(dName, connectionHelper, guild()).ifPresent(alarm -> {
         alarm.deactivate();
-        event.getChannel().sendMessage(alarm.toEmbed()).queue();
+        event.getChannel().sendMessageEmbeds(alarm.toEmbed()).queue();
       });
       break;
     case "delete":
@@ -229,7 +229,7 @@ public class AlarmListener extends AbstractMessageListener<ServerConfig> {
     private void run() {
       if (shouldBeRun()) {
         guild.getTextChannelById(channel).sendMessage(ping)
-            .embed(new EmbedBuilder().setTitle(title).setDescription(message).setColor(Color.ORANGE).build())
+            .setEmbeds(new EmbedBuilder().setTitle(title).setDescription(message).setColor(Color.ORANGE).build())
             .queue(message -> {
               if (durationseconds != null && durationseconds > 0) {
                 new Timer().schedule(Utilities.timerTask(() -> message.delete().queue()), durationseconds * 1000);

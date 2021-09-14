@@ -74,7 +74,7 @@ public class AutoRespondListener extends AbstractMessageListener<ServerConfig> {
     } else if (messageContent.getArg(0).filter(x -> x.equals("list")).isPresent()) {
       List<Map<String, String>> responses = getResponses(connectionHelper);
       responses.forEach(resp -> event.getChannel()
-          .sendMessage(new EmbedBuilder().addField("Name", resp.get("name"), false)
+          .sendMessageEmbeds(new EmbedBuilder().addField("Name", resp.get("name"), false)
               .addField("Pattern", "`" + resp.get("pattern") + "`", false)
               .addField("Response",
                   resp.get("response").length() > 1020 ? resp.get("response").substring(0, 1020) + "..."

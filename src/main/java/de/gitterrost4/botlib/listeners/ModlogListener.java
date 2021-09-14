@@ -81,7 +81,7 @@ public class ModlogListener extends AbstractListener<ServerConfig> {
     builder.setDescription("Message edited in " + event.getChannel().getAsMention());
     builder.setColor(Color.decode("#117ea6"));
     builder.setFooter("User ID: " + event.getMember().getId());
-    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessage(builder.build()).queue();
+    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessageEmbeds(builder.build()).queue();
     new Timer().schedule(new TimerTask() {
       @Override
       public void run() {
@@ -116,7 +116,7 @@ public class ModlogListener extends AbstractListener<ServerConfig> {
     builder.setColor(Color.decode("#ff470f"));
     builder.setFooter(
         "Author: " + oldMessage.map(x -> x.get(1)).orElse("Unknown") + " | Message ID: " + event.getMessageId());
-    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessage(builder.build()).queue();
+    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessageEmbeds(builder.build()).queue();
     connectionHelper.update("delete from messagecache where messageid=? and channelid=?", event.getMessageId(),
         event.getChannel().getId());
   }
@@ -133,7 +133,7 @@ public class ModlogListener extends AbstractListener<ServerConfig> {
     builder.addField("User", event.getUser().getAsTag(), false);
     builder.setColor(Color.decode("#ff470f"));
     builder.setFooter("User ID: " + event.getUser().getId());
-    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessage(builder.build()).queue();
+    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessageEmbeds(builder.build()).queue();
   }
 
   @Override
@@ -152,7 +152,7 @@ public class ModlogListener extends AbstractListener<ServerConfig> {
     }
     builder.setColor(Color.decode("#23d160"));
     builder.setFooter("User ID: " + event.getUser().getId());
-    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessage(builder.build()).queue();
+    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessageEmbeds(builder.build()).queue();
   }
 
   @Override
@@ -167,7 +167,7 @@ public class ModlogListener extends AbstractListener<ServerConfig> {
     builder.addField("User", event.getUser().getAsTag(), false);
     builder.setColor(Color.decode("#ff470f"));
     builder.setFooter("User ID: " + event.getUser().getId());
-    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessage(builder.build()).queue();
+    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessageEmbeds(builder.build()).queue();
   }
 
   @Override
@@ -176,6 +176,7 @@ public class ModlogListener extends AbstractListener<ServerConfig> {
     if (!event.getGuild().getId().equals(guild.getId())) {
       return;
     }
+    
     EmbedBuilder builder = getBuilder();
     builder.setDescription("User Roles added");
     setEmbedAuthor(builder, event.getMember());
@@ -183,7 +184,7 @@ public class ModlogListener extends AbstractListener<ServerConfig> {
     builder.addField("Roles", event.getRoles().stream().map(Role::getName).collect(Collectors.joining(", ")), false);
     builder.setColor(Color.decode("#117ea6"));
     builder.setFooter("User ID: " + event.getUser().getId());
-    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessage(builder.build()).queue();
+    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessageEmbeds(builder.build()).queue();
   }
 
   @Override
@@ -199,7 +200,7 @@ public class ModlogListener extends AbstractListener<ServerConfig> {
     builder.addField("Roles", event.getRoles().stream().map(Role::getName).collect(Collectors.joining(", ")), false);
     builder.setColor(Color.decode("#117ea6"));
     builder.setFooter("User ID: " + event.getUser().getId());
-    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessage(builder.build()).queue();
+    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessageEmbeds(builder.build()).queue();
   }
 
   @Override
@@ -216,7 +217,7 @@ public class ModlogListener extends AbstractListener<ServerConfig> {
     builder.addField("New Nickname", Optional.ofNullable(event.getNewNickname()).orElse("None"), false);
     builder.setColor(Color.decode("#117ea6"));
     builder.setFooter("User ID: " + event.getUser().getId());
-    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessage(builder.build()).queue();
+    guild().getTextChannelById(config.getModlogConfig().getChannelId()).sendMessageEmbeds(builder.build()).queue();
   }
 
   private static EmbedBuilder getBuilder() {
