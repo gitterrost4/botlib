@@ -1,6 +1,8 @@
 package de.gitterrost4.botlib.listeners;
 
 import java.awt.Color;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -53,7 +55,7 @@ public class AlarmListener extends AbstractMessageListener<ServerConfig> {
       String ping = message.getTokenizedArgOrThrow(5);
       String title = message.getTokenizedArgOrThrow(6);
       String newMessage = message.getTokenizedArgOrThrow(7);
-      Alarm newAlarm = new Alarm(newName, cronExpression, channel, ping, title, newMessage, durationSeconds, ZonedDateTime.now(),
+      Alarm newAlarm = new Alarm(newName, cronExpression, channel, ping, title, newMessage, durationSeconds, Instant.now().atZone(ZoneId.of("Z")),
           connectionHelper, guild);
       newAlarm.writeToDatabase();
       event.getChannel().sendMessageEmbeds(newAlarm.toEmbed()).queue();
@@ -206,7 +208,7 @@ public class AlarmListener extends AbstractMessageListener<ServerConfig> {
     private boolean shouldBeRun() {
       CronParser parser = getCronParser();
       ExecutionTime time = ExecutionTime.forCron(parser.parse(cronexpression));
-      return time.nextExecution(lastrun).filter(nextRun -> nextRun.isBefore(ZonedDateTime.now())).isPresent();
+      return time.nextExecution(lastrun).filter(nextRun -> nextRun.isBefore(Instant.now().atZone(ZoneId.of("Z")))).isPresent();
     }
 
     private static CronParser getCronParser() {
@@ -222,7 +224,7 @@ public class AlarmListener extends AbstractMessageListener<ServerConfig> {
                 new Timer().schedule(Utilities.timerTask(() -> message.delete().queue()), durationseconds * 1000);
               }
             });
-        lastrun = ZonedDateTime.now();
+        lastrun = Instant.now().atZone(ZoneId.of("Z"));
         writeToDatabase();
       }
     }
@@ -236,7 +238,8 @@ public class AlarmListener extends AbstractMessageListener<ServerConfig> {
               true)
           .addField("Next Execution",
               ExecutionTime.forCron(getCronParser().parse(cronexpression)).nextExecution(lastrun)
-                  .map(ZonedDateTime::toString).orElse("unknown"),
+                  .map(x->x.toInstant().getEpochSecond())
+                  .map(x->"<t:"+x+":R>").orElse("unknown"),
               true)
           .addField("Active", active ? "Yes" : "No", true)
           .addField("Duration(seconds)", durationseconds.toString(),true)
