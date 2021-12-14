@@ -20,17 +20,26 @@ public class Utilities {
   }
 
   public static void deleteMessages(TextChannel channel, List<Message> retrievedHistory) {
-  //    retrievedHistory.add(event.getMessage());
-      if (retrievedHistory.size() > 1) {
-        channel.deleteMessages(retrievedHistory).queue();
-      } else {
-        retrievedHistory.forEach(msg -> msg.delete().queue());
-      }
+    // retrievedHistory.add(event.getMessage());
+    channel.purgeMessages(retrievedHistory);
+  }
+
+  public static boolean isNumericInt(String s) {
+    if (s == null) {
+      return false;
     }
-  
+    try {
+      Integer.parseInt(s);
+    } catch (NumberFormatException nfe) {
+      return false;
+    }
+    return true;
+
+  }
+
   public static TimerTask timerTask(Runnable r) {
     return new TimerTask() {
-      
+
       @Override
       public void run() {
         r.run();

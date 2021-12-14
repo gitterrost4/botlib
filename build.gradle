@@ -15,7 +15,7 @@ plugins {
 }
 
 group = 'de.gitterrost4'
-version = '21.10.1'
+version = '21.12.1'
 
 dependencies {
     // This dependency is exported to consumers, that is to say found on their compile classpath.
