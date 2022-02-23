@@ -15,7 +15,7 @@ public class BotTrapListener extends AbstractListener<ServerConfig>{
   protected void messageReceived(MessageReceivedEvent event) {
     super.messageReceived(event);
     if(event.getChannel().getId().equals(config.getBotTrapConfig().getChannelId())) {
-      event.getMember().ban(7).queue();
+      event.getMember().ban(7, "Spamming. Message: \n"+event.getMessage().getContentStripped()).queue();
     }
   }
 
