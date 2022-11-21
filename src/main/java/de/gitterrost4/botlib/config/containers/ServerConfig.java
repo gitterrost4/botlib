@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.gitterrost4.botlib.config.containers.modules.AlarmConfig;
+import de.gitterrost4.botlib.config.containers.modules.AutoPublishConfig;
 import de.gitterrost4.botlib.config.containers.modules.AutoRespondConfig;
 import de.gitterrost4.botlib.config.containers.modules.AvatarConfig;
 import de.gitterrost4.botlib.config.containers.modules.BanConfig;
@@ -36,6 +37,7 @@ import de.gitterrost4.botlib.listeners.ReminderListener;
 import de.gitterrost4.botlib.listeners.RoleCountListener;
 import de.gitterrost4.botlib.listeners.SayListener;
 import de.gitterrost4.botlib.listeners.WhoisListener;
+import de.gitterrost4.botlib.listeners.modtools.AutoPublishListener;
 import de.gitterrost4.botlib.listeners.modtools.BanListener;
 import de.gitterrost4.botlib.listeners.modtools.FakeBanListener;
 import de.gitterrost4.botlib.listeners.modtools.MuteListener;
@@ -67,6 +69,7 @@ public abstract class ServerConfig {
   private MuteConfig muteConfig;  
   private GibConfig gibConfig;
   private BotTrapConfig botTrapConfig;
+  private AutoPublishConfig autoPublishConfig;
   
   @Override
   public String toString() {
@@ -76,7 +79,7 @@ public abstract class ServerConfig {
         + ", mirrorConfig=" + mirrorConfig + ", modlogConfig=" + modlogConfig + ", reminderConfig=" + reminderConfig
         + ", roleCountConfig=" + roleCountConfig + ", sayConfig=" + sayConfig + ", whoisConfig=" + whoisConfig
         + ", banConfig=" + banConfig + ", fakeBanConfig=" + fakeBanConfig + ", muteConfig=" + muteConfig
-        + ", gibConfig=" + gibConfig + ", botTrapConfig=" + botTrapConfig + "]";
+        + ", gibConfig=" + gibConfig + ", botTrapConfig=" + botTrapConfig + ", autoPublishConfig=" + autoPublishConfig + "]";
   }
 
   public List<String> getSuperUserRoles() {
@@ -162,6 +165,10 @@ public abstract class ServerConfig {
   public BotTrapConfig getBotTrapConfig() {
     return botTrapConfig;
   }
+  
+  public AutoPublishConfig getAutoPublishConfig() {
+    return autoPublishConfig;
+  }
 
   public void iAddServerModules(JDA jda) {
     Guild guild = jda.getGuildById(getServerId());
@@ -217,6 +224,9 @@ public abstract class ServerConfig {
     }
     if (Optional.ofNullable(getBotTrapConfig()).map(ModuleConfig::isEnabled).orElse(false)) {
       manager.addEventListener(new BotTrapListener(jda, guild, this));
+    }
+    if (Optional.ofNullable(getAutoPublishConfig()).map(ModuleConfig::isEnabled).orElse(false)) {
+      manager.addEventListener(new AutoPublishListener(jda, guild, this));
     }
     addServerModules(jda, guild, manager);
   }
